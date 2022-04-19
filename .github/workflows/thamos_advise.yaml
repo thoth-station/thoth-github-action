@@ -1,11 +1,11 @@
-name: Main workflow for Thoth adviser GitHub action
+name: Thoth adviser
 on: push
 env: 
   RECOMMENDATION_TYPE: security
 
 jobs:
   thamos-advise:
-    name: Get security advise from Thoth
+    name: Get advise on dependencies
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
