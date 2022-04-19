@@ -1,0 +1,34 @@
+[[source]]
+url = "https://pypi.python.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+voluptuous = "*"
+"boto3" = "*"
+thoth-common = "*"
+python-dateutil = "*"
+thoth-python = "*"
+click = "*"
+pyyaml = "*"
+sqlalchemy = "<1.4.0"
+psycopg2-binary = "*"
+sqlalchemy-utils = "*"
+alembic = "*"
+thoth-ssdeep = "*"
+packaging = "*"
+
+[dev-packages]
+pytest = "*"
+pytest-timeout = "*"
+pytest-cov = "*"
+flexmock = "*"
+moto = "==1.3.8"
+sadisplay = "*"
+pydot = "*"
+pytest-mypy = "*"
+podman-compose = "*"
+sqlalchemy-stubs = "*"
+
+[requires]
+python_version = "3.8"
