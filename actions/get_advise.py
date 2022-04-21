@@ -25,6 +25,11 @@ from thamos.lib import advise_here
 _RECOMMENDATION_TYPE = os.getenv("RECOMMENDATION_TYPE", "security")
 
 advise_result = advise_here(recommendation_type=_RECOMMENDATION_TYPE)[0]
+
+if advise_result.get("error") == True:
+    if advise_result.get("error_msg") == "No direct dependencies found":
+        raise Exception("No direct dependencies found for this repository.")
+
 justifications = advise_result.get("report").get("products")[0].get("justification")
 
 if any(justification.get("type") == "WARNING" for justification in justifications):
@@ -38,4 +43,4 @@ if any(justification.get("type") == "WARNING" for justification in justification
             vulnerabilities_report += "\n\n"
 
     print(vulnerabilities_report)
-    raise Exception("Vulnerabilities have been detected in your dependencies")
+    raise Exception("Vulnerabilities have been detected in your dependencies.")
