@@ -1,7 +1,7 @@
 name: Thoth adviser
 on: push
 env: 
-  RECOMMENDATION_TYPE: security
+  REQUIREMENTS_FORMAT: pipenv
 
 jobs:
   thamos-advise:
