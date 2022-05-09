@@ -26,9 +26,6 @@ _REQUIREMENTS_FORMAT = os.getenv("REQUIREMENTS_FORMAT", "pipenv")
 
 os.system(f"sed -i 's/pip-tools/{_REQUIREMENTS_FORMAT}/g' actions/ubuntu_config_template.yaml")
 
-with open("actions/ubuntu_config_template.yaml", "r") as file:
-    print(file.read())
-
 os.system("thamos config --no-interactive --template actions/ubuntu_config_template.yaml")
 
 advise_result = advise_here(src_path="..", recommendation_type="security")[0]
