@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # thoth-github-action
-# Copyright(C) 2022 - Red Hat, Inc.
+# Copyright(C) 2022 - Maya Costantini
 #
 # This program is free software: you can redistribute it and / or modify
 # it under the terms of the GNU General Public License as published by
@@ -21,26 +21,23 @@ import os
 
 from thamos.lib import advise_here
 
+_REQUIREMENTS_FORMAT = os.getenv("REQUIREMENTS_FORMAT", "pipenv")
 
-_RECOMMENDATION_TYPE = os.getenv("RECOMMENDATION_TYPE", "security")
 
-advise_result = advise_here(recommendation_type=_RECOMMENDATION_TYPE)[0]
+os.system(f"sed -i 's/pip-tools/{_REQUIREMENTS_FORMAT}/g' actions/ubuntu_config_template.yaml")
 
-if advise_result.get("error") == True:
-    if advise_result.get("error_msg") == "No direct dependencies found":
-        raise Exception("No direct dependencies found for this repository.")
+with open("actions/ubuntu_config_template.yaml", "r") as file:
+    print(file.read())
 
-justifications = advise_result.get("report").get("products")[0].get("justification")
+os.system("thamos config --no-interactive --template actions/ubuntu_config_template.yaml")
 
-if any(justification.get("type") == "WARNING" for justification in justifications):
-    vulnerabilities_report = ""
+advise_result = advise_here(src_path="..", recommendation_type="security")[0]
 
-    for justification in justifications:
-        if justification.get("type") == "WARNING":
-            for k, v in justification.items():
-                vulnerabilities_report += f"{k}: {v}"
-                vulnerabilities_report += "\n"
-            vulnerabilities_report += "\n\n"
-
-    print(vulnerabilities_report)
-    raise Exception("Vulnerabilities have been detected in your dependencies.")
+if advise_result.get("error"):
+    error_message = advise_result.get("error_msg")
+    if advise_result.get("report").get("stack_info"):
+        for stack_info in advise_result.get("report").get("stack_info"):
+            for k, v in stack_info.items():
+                print(f"{k}: {v}")
+            print("\n")
+    raise Exception(error_message)
