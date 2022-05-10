@@ -22,7 +22,7 @@ Specify a pattern and rules to follow for branches you want to protect from unch
 ## Testing the Action locally
 
 You can test the action locally using [`act`](https://github.com/nektos/act) without pushing or committing directly to the repository.
-You can follow the installation instructions for `act` [here](https://github.com/nektos/act#installation). 
+You can follow the installation instructions for `act` [here](https://github.com/nektos/act#installation).
 Note that `act` requires Docker to be installed and that it does not currently support Podman. If you want to have Docker and Podman simultaneously installed on your system (RHEL8 or CentOS8), you can follow [this tutorial](https://medium.com/faun/how-to-install-simultaneously-docker-and-podman-on-rhel-8-centos-8-cb67412f321e).
 
 When your workflows and actions are ready to be tested, use the [`act` command line interface](https://github.com/nektos/act#example-commands) to trigger the Action locally.
