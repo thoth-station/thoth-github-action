@@ -36,12 +36,6 @@ managers:
   - name: info
   - name: version
     configuration:
-      # A list of maintainers (GitHub or GitLab accounts) of this repository:
-      maintainers:
-        - codificat
-        - goern
-        - fridex
-        - mayacostantini
       # A list of assignees to which the opened pull requests and issues should
       # be assigned to:
       assignees:
