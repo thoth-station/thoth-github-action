@@ -1,6 +1,6 @@
 name: Thoth adviser
 on: push
-env: 
+env:
   REQUIREMENTS_FORMAT: pipenv
 
 jobs:
@@ -15,7 +15,6 @@ jobs:
         with:
           python-version: 3.8
       - name: Get Thoth advise
-        run: | 
+        run: |
           pip install thamos
           python3 actions/get_advise.py
-        
