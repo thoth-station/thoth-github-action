@@ -18,9 +18,6 @@ jobs:
     name: Get Thoth recommenations on your dependencies
     steps:
       - uses: actions/checkout@v3
-      - uses: actions/setup-python@v2
-        with:
-          python-version: 3.8
       - name: Get Thoth security advisories
         id: thoth-advise
         uses: thoth-station/thoth-github-action@v1

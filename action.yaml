@@ -27,7 +27,7 @@ runs:
         sed -i "s/pip-tools/${{ inputs.requirements-format }}/g" $GITHUB_ACTION_PATH/actions/ubuntu_config_template.yaml
         thamos config --no-interactive --template $GITHUB_ACTION_PATH/actions/ubuntu_config_template.yaml
         thamos advise --recommendation-type security > advise_result.json
-        echo "::set-output name=thoth-search-ui-link::'https://thoth-station.ninja/search/$(cat .thoth_last_analysis_id)/summary'"
+        echo "::set-output name=thoth-search-ui-link::https://thoth-station.ninja/search/$(cat .thoth_last_analysis_id)/summary"
         echo "::set-output name=advise-result::$(cat advise_result.json)"
     - name: Comment Pull Request
       uses: marocchino/sticky-pull-request-comment@v2
