@@ -24,6 +24,7 @@ runs:
       with:
         python-version: 3.8
     - name: Get Thoth advise
+      shell: bash
       id: get-thoth-advise
       run: |
         mkdir /tmp/thoth/
