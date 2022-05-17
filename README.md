@@ -1,13 +1,48 @@
 # Thoth Adviser GitHub Action
 
-This is a test repository to provide Thoth security advise on a repository dependencies via a GitHub Action.
+Get Thoth security guidance on your Python project dependencies.
 
-## Workflows and actions
+## Usage
 
-This action is composed of a main workflow `.github/workflows/action.yaml` which triggers Thoth advise on dependencies present in the manifest file of the current repository on push.
+```
+name: Your CI workflow
+on:
+  push:
+    paths:
+      - 'requirements.txt'
+      - 'Pipfile'
+jobs:
+  validate-dependencies:
+    runs-on: ubuntu-latest
+    container: quay.io/thoth-station/s2i-thoth-ubi8-py38:latest
+    name: Get Thoth recommenations on your dependencies
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v2
+        with:
+          python-version: 3.8
+      - name: Get Thoth security advisories
+        id: thoth-advise
+        uses: thoth-station/thoth-github-action@v1
+        with:
+          requirements-path: 'Pipfile'
+          requirements-format: pipenv
+```
+
+This action should be configured to run on a push event if the requirements file specifying a project dependencies has been modified by the current pull request or commit. In the `on.push.paths` field, specify the path of the requirements file in the repository (supported formats are `Pipfile` or `requirements.txt`).
+
+Before running the `thoth-github-action`, steps should include checking out the current repository with `actions/checkout@v3` and setting up a Python environment with
+```
+- uses: actions/setup-python@v2
+  with:
+    python-version: 3.8
+```
+
+The `requirements-path` input parameter representing the path to the requirements file is required to run `thoth-github-action`, as well as the `requirements-format` parameter to specify the format of your dependencies requirements (one of (pip | pip-tools | pip-compile | pipenv)).
+
 The workflow succeeds if the specified dependencies could be properly resolved and fails if security issues or incompatibilities are preventing the resolution, producing an error message and and blocking the CI if configured to do so.
 
-## Configuring the Action on a repository
+### Integrating Thoth into a CI workflow
 
 When the Action is triggered on any push event, it is possible to block the pull request concerned in case of workflow failure.
 To do so, navigate to your repository `Settings` and go to the `Branches` section.

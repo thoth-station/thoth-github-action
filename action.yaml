@@ -1,0 +1,43 @@
+name: Thoth Adviser
+author: thoth-station
+description: Get Security Recommendations on your Python Dependencies
+inputs:
+  requirements-path:
+    description: Dependency requirements file path
+    default: Pipfile
+  requirements-format:
+    description: Requirements format for dependencies, one of (pip | pip-tools | pip-compile | pipenv)
+outputs:
+  thoth-search-ui-link:
+    description: "Link to results in Thoth Search UI"
+    value: ${{ steps.get-thoth-advise.outputs.thoth-search-ui-link }}
+  advise-result:
+    description: "Advise result"
+    value: ${{ steps.get-thoth-advise.outputs.advise-result }}
+runs:
+  using: 'composite'
+  steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+    - name: Setup Python
+      uses: actions/setup-python@v3
+      with:
+        python-version: 3.8
+    - name: Get Thoth advise
+      id: get-thoth-advise
+      run: |
+        mkdir /tmp/thoth/
+        cp -r * /tmp/thoth/
+        cd /tmp/thoth/
+        sed -i "s/pip-tools/${{ inputs.requirements-format }}/g" actions/ubuntu_config_template.yaml
+        thamos config --no-interactive --template actions/ubuntu_config_template.yaml
+        thamos advise --recommendation-type security > advise_result.json
+        echo "::set-output name=thoth-search-ui-link::'https://thoth-station.ninja/search/$(cat .thoth_last_analysis_id)/summary'"
+        echo "::set-output name=advise-result::$(cat advise_result.json)"
+    - name: Comment Pull Request
+      uses: marocchino/sticky-pull-request-comment@v2
+      with:
+        header: Thoth Security Advise
+        message: |
+          Link to advise results in Thoth Search UI: ${{ steps.get-thoth-advise.outputs.thoth-last-analysis-id }}
+          Advise Result: ${{ steps.get-thoth-advise.outputs.advise-result }}
