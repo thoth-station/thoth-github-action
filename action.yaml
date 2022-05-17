@@ -34,5 +34,6 @@ runs:
       with:
         header: Thoth Security Advise
         message: |
-          Link to advise results in Thoth Search UI: ${{ steps.get-thoth-advise.outputs.thoth-last-analysis-id }}
+          Link to advise results in Thoth Search UI: ${{ steps.get-thoth-advise.outputs.thoth-search-ui-link }}
           Advise Result: ${{ steps.get-thoth-advise.outputs.advise-result }}
+        number: ${{ github.event.number }}
