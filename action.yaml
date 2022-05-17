@@ -17,12 +17,6 @@ outputs:
 runs:
   using: 'composite'
   steps:
-    - name: Checkout repository
-      uses: actions/checkout@v3
-    - name: Setup Python
-      uses: actions/setup-python@v3
-      with:
-        python-version: 3.8
     - name: Get Thoth advise
       shell: bash
       id: get-thoth-advise
@@ -30,8 +24,8 @@ runs:
         mkdir /tmp/thoth/
         cp -r * /tmp/thoth/
         cd /tmp/thoth/
-        sed -i "s/pip-tools/${{ inputs.requirements-format }}/g" actions/ubuntu_config_template.yaml
-        thamos config --no-interactive --template actions/ubuntu_config_template.yaml
+        sed -i "s/pip-tools/${{ inputs.requirements-format }}/g" $GITHUB_ACTION_PATH/actions/ubuntu_config_template.yaml
+        thamos config --no-interactive --template $GITHUB_ACTION_PATH/actions/ubuntu_config_template.yaml
         thamos advise --recommendation-type security > advise_result.json
         echo "::set-output name=thoth-search-ui-link::'https://thoth-station.ninja/search/$(cat .thoth_last_analysis_id)/summary'"
         echo "::set-output name=advise-result::$(cat advise_result.json)"
