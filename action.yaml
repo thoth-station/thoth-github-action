@@ -24,11 +24,12 @@ runs:
         sed -i "s/pip-tools/${{ inputs.requirements-format }}/g" $GITHUB_ACTION_PATH/actions/ubuntu_config_template.yaml
         thamos config --no-interactive --template $GITHUB_ACTION_PATH/actions/ubuntu_config_template.yaml
         thamos advise --recommendation-type security > advise_result.json
-        echo "::set-output name=thoth-search-ui-link::https://thoth-station.ninja/search/$(cat .thoth_last_analysis_id)/summary"
-    - name: Comment Pull Request
-      uses: marocchino/sticky-pull-request-comment@v2
+        echo "::set-output name=thoth-search-ui-link::https://thoth-station.ninja/search/advise/$(cat .thoth_last_analysis_id)/summary"
+    - uses: jwalton/gh-find-current-pr@v1
+      id: finder
+    - uses: marocchino/sticky-pull-request-comment@v2
       with:
+        number: ${{ steps.finder.outputs.pr }}
         header: Thoth Security Advise
         message: |
           Link to advise results in Thoth Search UI: ${{ steps.get-thoth-advise.outputs.thoth-search-ui-link }}
-        number: ${{ github.event.number }}
