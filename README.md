@@ -15,7 +15,7 @@ jobs:
   validate-dependencies:
     runs-on: ubuntu-latest
     container: quay.io/thoth-station/s2i-thoth-ubi8-py38:latest
-    name: Get Thoth recommenations on your dependencies
+    name: Get Thoth recommendations on your dependencies
     steps:
       - uses: actions/checkout@v3
       - name: Get Thoth security advisories
@@ -28,14 +28,10 @@ jobs:
 
 This action should be configured to run on a push event if the requirements file specifying a project dependencies has been modified by the current pull request or commit. In the `on.push.paths` field, specify the path of the requirements file in the repository (supported formats are `Pipfile` or `requirements.txt`).
 
-Before running the `thoth-github-action`, steps should include checking out the current repository with `actions/checkout@v3` and setting up a Python environment with
-```
-- uses: actions/setup-python@v2
-  with:
-    python-version: 3.8
-```
+The `thoth-github-action` should be run using a `s2i-thoth` container image such as `quay.io/thoth-station/s2i-thoth-ubi8-py38:latest` as stated in the example workflow file above. These container images contain a ready-to-use Python environment with pre-installed packages necessary to get Thoth advice on the repository dependencies.
+Before running the action, steps should include checking out the current repository with `actions/checkout@v3`.
 
-The `requirements-path` input parameter representing the path to the requirements file is required to run `thoth-github-action`, as well as the `requirements-format` parameter to specify the format of your dependencies requirements (one of (pip | pip-tools | pip-compile | pipenv)).
+The `requirements-path` input parameter representing the path to the requirements file is required to run `thoth-github-action`, as well as the `requirements-format` parameter to specify the format of your dependencies requirements (one of `pip`, `pip-tools`, `pip-compile` or `pipenv`).
 
 The workflow succeeds if the specified dependencies could be properly resolved and fails if security issues or incompatibilities are preventing the resolution, producing an error message and and blocking the CI if configured to do so.
 
