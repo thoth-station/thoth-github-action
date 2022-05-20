@@ -28,7 +28,7 @@ jobs:
 
 This action should be configured to run on a push event if the requirements file specifying a project dependencies has been modified by the current pull request or commit. In the `on.push.paths` field, specify the path of the requirements file in the repository (supported formats are `Pipfile` or `requirements.txt`).
 
-The `thoth-github-action` should be run using a `s2i-thoth` container image such as `quay.io/thoth-station/s2i-thoth-ubi8-py38:latest` as stated in the example workflow file above. These container images contain a ready-to-use Python environment with pre-installed packages necessary to get Thoth advice on the repository dependencies.
+The `thoth-github-action` should be run using a `s2i-thoth` container image such as `quay.io/thoth-station/s2i-thoth-ubi8-py38:latest` as stated in the example workflow file above. These container images contain a ready-to-use Python environment with pre-installed packages necessary to get Thoth advice on the repository dependencies. For more information on Thoth container images, see the [s2i-thoth repository](https://github.com/thoth-station/s2i-thoth#s2i-thoth).
 Before running the action, steps should include checking out the current repository with `actions/checkout@v3`.
 
 The `requirements-path` input parameter representing the path to the requirements file is required to run `thoth-github-action`, as well as the `requirements-format` parameter to specify the format of your dependencies requirements (one of `pip`, `pip-tools`, `pip-compile` or `pipenv`).
