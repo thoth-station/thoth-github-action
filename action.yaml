@@ -9,8 +9,14 @@ inputs:
     description: Requirements format for dependencies, one of (pip | pip-tools | pip-compile | pipenv)
 outputs:
   thoth-search-ui-link:
-    description: "Link to results in Thoth Search UI"
+    description: Link to results in Thoth Search UI
     value: ${{ steps.get-thoth-advise.outputs.thoth-search-ui-link }}
+  thoth-error-msg:
+    description: Error message if dependencies could not be resolved
+    value: ${{ steps.get-thoth-advise.outputs.thoth-error-msg }}
+  advise-exit-code:
+    description: Exit code returned in case of advise failure
+    value: ${{ steps.get-thoth-advise.outputs.advise-exit-code }}
 runs:
   using: 'composite'
   steps:
@@ -18,18 +24,38 @@ runs:
       shell: bash
       id: get-thoth-advise
       run: |
+        set +e
         mkdir /tmp/thoth/
         cp -r * /tmp/thoth/
         cd /tmp/thoth/
         sed -i "s/pip-tools/${{ inputs.requirements-format }}/g" $GITHUB_ACTION_PATH/actions/ubuntu_config_template.yaml
         thamos config --no-interactive --template $GITHUB_ACTION_PATH/actions/ubuntu_config_template.yaml
-        thamos advise --recommendation-type security > advise_result.json
-        echo "::set-output name=thoth-search-ui-link::https://thoth-station.ninja/search/advise/$(cat .thoth_last_analysis_id)/summary"
+        thamos advise --recommendation-type security --no-write --json > $GITHUB_ACTION_PATH/advise_result.json
+        if [[ $? -eq 0 ]];
+          then
+            sed -i -n '/"error":/,$p' $GITHUB_ACTION_PATH/advise_result.json
+            sed -i '1s/^/{/' $GITHUB_ACTION_PATH/advise_result.json
+            echo "::set-output name=thoth-error-msg:: :heavy_check_mark: $(python3 $GITHUB_ACTION_PATH/verify_cve.py $GITHUB_ACTION_PATH/advise_result.json)"
+            echo "::set-output name=thoth-search-ui-link::https://thoth-station.ninja/search/advise/$(cat .thoth_last_analysis_id)/summary"
+        else
+          echo "::set-output name=advise-exit-code::$?"
+          echo "::set-output name=thoth-error-msg:: :x: dependencies could not be resolved."
+          echo "::set-output name=thoth-search-ui-link:: https://thoth-station.ninja/search/advise/$(cat .thoth_last_analysis_id)/summary"
+        fi
     - uses: jwalton/gh-find-current-pr@v1
       id: finder
     - uses: marocchino/sticky-pull-request-comment@v2
       with:
         number: ${{ steps.finder.outputs.pr }}
-        header: Thoth Security Advise
+        recreate: true
         message: |
-          Link to advise results in Thoth Search UI: ${{ steps.get-thoth-advise.outputs.thoth-search-ui-link }}
+          - **Dependency analysis status:** ${{ steps.get-thoth-advise.outputs.thoth-error-msg }}
+          - **Link to advise results in Thoth Search UI:** ${{ steps.get-thoth-advise.outputs.thoth-search-ui-link }}
+    - name: Fail workflow if dependencies could not be resolved
+      shell: bash
+      id: fail-workflow-if-error
+      run: |
+        if [ ${{ steps.get-thoth-advise.outputs.advise-exit-code }} -gt 0 ];
+          then
+            exit ${{ steps.get-thoth-advise.outputs.advise-exit-code }}
+        fi
