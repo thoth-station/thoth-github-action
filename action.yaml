@@ -4,9 +4,12 @@ description: Get Security Recommendations on your Python Dependencies
 inputs:
   requirements-path:
     description: Dependency requirements file path
+    required: true
     default: Pipfile
   requirements-format:
     description: Requirements format for dependencies, one of (pip | pip-tools | pip-compile | pipenv)
+    required: true
+    default: pipenv
 outputs:
   thoth-search-ui-link:
     description: Link to results in Thoth Search UI
@@ -28,7 +31,7 @@ runs:
         mkdir /tmp/thoth/
         cp -r * /tmp/thoth/
         cd /tmp/thoth/
-        sed -i "s/pip-tools/${{ inputs.requirements-format }}/g" $GITHUB_ACTION_PATH/actions/ubuntu_config_template.yaml
+        sed -i "s/pipenv/${{ inputs.requirements-format }}/g" $GITHUB_ACTION_PATH/actions/ubuntu_config_template.yaml
         thamos config --no-interactive --template $GITHUB_ACTION_PATH/actions/ubuntu_config_template.yaml
         thamos advise --recommendation-type security --no-write --json > $GITHUB_ACTION_PATH/advise_result.json
         if [[ $? -eq 0 ]];
