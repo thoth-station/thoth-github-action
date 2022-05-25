@@ -11,6 +11,7 @@ on:
     paths:
       - 'requirements.txt'
       - 'Pipfile'
+      - 'setup.cfg'
 jobs:
   validate-dependencies:
     runs-on: ubuntu-latest

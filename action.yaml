@@ -7,7 +7,7 @@ inputs:
     required: true
     default: Pipfile
   requirements-format:
-    description: Requirements format for dependencies, one of (pip | pip-tools | pip-compile | pipenv)
+    description: Requirements format for dependencies, one of (pip | pip-tools | pip-compile | pipenv | setup.cfg)
     required: true
     default: pipenv
 outputs:
@@ -31,8 +31,15 @@ runs:
         mkdir /tmp/thoth/
         cp -r * /tmp/thoth/
         cd /tmp/thoth/
-        sed -i "s/pipenv/${{ inputs.requirements-format }}/g" $GITHUB_ACTION_PATH/actions/ubuntu_config_template.yaml
-        thamos config --no-interactive --template $GITHUB_ACTION_PATH/actions/ubuntu_config_template.yaml
+        if ${{ inputs.requirements-format == 'setup.cfg' }};
+          then
+            requirements_format=pip
+            echo "$($GITHUB_ACTION_PATH/setup_cfg_to_requirements_txt.py ${{ inputs.requirements-path }})"
+        else
+          requirements_format=${{ inputs.requirements-format }}
+        fi
+        sed -i "s/pipenv/$requirements_format/g" $GITHUB_ACTION_PATH/templates/ubuntu_config_template.yaml
+        thamos config --no-interactive --template $GITHUB_ACTION_PATH/templates/ubuntu_config_template.yaml
         thamos advise --recommendation-type security --no-write --json > $GITHUB_ACTION_PATH/advise_result.json
         if [[ $? -eq 0 ]];
           then
@@ -53,7 +60,7 @@ runs:
         recreate: true
         message: |
           - **Dependency analysis status:** ${{ steps.get-thoth-advise.outputs.thoth-error-msg }}
-          - **Link to advise results in Thoth Search UI:** ${{ steps.get-thoth-advise.outputs.thoth-search-ui-link }}
+          - **See advise results in Thoth Search UI:** ${{ steps.get-thoth-advise.outputs.thoth-search-ui-link }}
     - name: Fail workflow if dependencies could not be resolved
       shell: bash
       id: fail-workflow-if-error
