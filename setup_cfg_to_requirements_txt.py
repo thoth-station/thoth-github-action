@@ -15,26 +15,22 @@
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-"""Analyze the output of adviser report for CVE."""
+"""Convert setup.cfg to requirements.txt."""
 
-
-import json
+import configparser
+import os
 import sys
 
-from json.decoder import JSONDecodeError
 
+def _convert_setup_to_requirements(setup_file_path: str) -> None:
+    """Convert setup.cfg to requirements.txt."""
+    cfgparser = configparser.ConfigParser()
+    cfgparser.read(setup_file_path)
+    requirements_file_path = os.path.join(os.path.dirname(os.path.abspath(setup_file_path)), "requirements.txt")
 
-def _process_advise_result(advise_result_path: str) -> str:
-    """Process advise results from generated output file."""
-    with open(advise_result_path, "r") as results_file:
-        try:
-            results = json.load(results_file)
-            if results.get("error"):
-                return "\N{Cross Mark} " + results.get("error_msg")
-            return "No vulnerabilities detected in your dependencies."
-        except JSONDecodeError as json_decode_error:
-            raise json_decode_error
+    with open(requirements_file_path, "w") as requirements_file:
+        requirements_file.write(cfgparser["options"]["install_requires"])
 
 
 if __name__ == "__main__":
-    print(_process_advise_result(sys.argv[1]))
+    _convert_setup_to_requirements(sys.argv[1])
