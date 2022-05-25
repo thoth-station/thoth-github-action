@@ -41,17 +41,18 @@ runs:
         sed -i "s/pipenv/$requirements_format/g" $GITHUB_ACTION_PATH/templates/ubuntu_config_template.yaml
         thamos config --no-interactive --template $GITHUB_ACTION_PATH/templates/ubuntu_config_template.yaml
         thamos advise --recommendation-type security --no-write --json > $GITHUB_ACTION_PATH/advise_result.json
-        if [[ $? -eq 0 ]];
+        advise_exit_code=$?
+        if [[ $advise_exit_code -eq 0 ]];
           then
             sed -i -n '/"error":/,$p' $GITHUB_ACTION_PATH/advise_result.json
             sed -i '1s/^/{/' $GITHUB_ACTION_PATH/advise_result.json
             echo "::set-output name=thoth-error-msg:: :heavy_check_mark: $(python3 $GITHUB_ACTION_PATH/verify_cve.py $GITHUB_ACTION_PATH/advise_result.json)"
             echo "::set-output name=thoth-search-ui-link::https://thoth-station.ninja/search/advise/$(cat .thoth_last_analysis_id)/summary"
         else
-          echo "::set-output name=advise-exit-code::$?"
           echo "::set-output name=thoth-error-msg:: :x: dependencies could not be resolved."
           echo "::set-output name=thoth-search-ui-link:: https://thoth-station.ninja/search/advise/$(cat .thoth_last_analysis_id)/summary"
         fi
+        echo "::set-output name=advise-exit-code::$advise_exit_code"
     - uses: jwalton/gh-find-current-pr@v1
       id: finder
     - uses: marocchino/sticky-pull-request-comment@v2
