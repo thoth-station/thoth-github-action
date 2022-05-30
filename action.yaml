@@ -46,7 +46,7 @@ runs:
         else
             requirements_format=${{ inputs.requirements-format }}
         fi
-        if [ ${{ inputs.overlay-directory }} != '' ];
+        if [ '${{ inputs.overlay-directory }}' != '' ];
             then
             thamos check
             sed -i "s/pipenv/$requirements_format/g" .thoth.yaml
