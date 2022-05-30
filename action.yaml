@@ -1,6 +1,7 @@
 name: Thoth Adviser
 author: thoth-station
 description: Get Security Recommendations on your Python Dependencies
+
 inputs:
   requirements-path:
     description: Dependency requirements file path
@@ -10,6 +11,9 @@ inputs:
     description: Requirements format for dependencies, one of (pip | pip-tools | pip-compile | pipenv | setup.cfg)
     required: true
     default: pipenv
+  overlay-directory:
+    description: Optional overlay directory to get advise on a specific environment (see documentation for overlays configuration https://github.com/thoth-station/thamos#overlays-directory)
+    required: false
 outputs:
   thoth-search-ui-link:
     description: Link to results in Thoth Search UI
@@ -20,6 +24,10 @@ outputs:
   advise-exit-code:
     description: Exit code returned in case of advise failure
     value: ${{ steps.get-thoth-advise.outputs.advise-exit-code }}
+  runtime-environment:
+    description: Runtime environment for which the advise was run
+    value: $${{ steps.get-thoth-advise.outputs.runtime-environment }}
+
 runs:
   using: 'composite'
   steps:
@@ -32,29 +40,43 @@ runs:
         cp -r * /tmp/thoth/
         cd /tmp/thoth/
         if ${{ inputs.requirements-format == 'setup.cfg' }};
-          then
+            then
             requirements_format=pip
             echo "$($GITHUB_ACTION_PATH/setup_cfg_to_requirements_txt.py ${{ inputs.requirements-path }})"
         else
-          requirements_format=${{ inputs.requirements-format }}
+            requirements_format=${{ inputs.requirements-format }}
         fi
-        sed -i "s/pipenv/$requirements_format/g" $GITHUB_ACTION_PATH/templates/ubuntu_config_template.yaml
-        thamos config --no-interactive --template $GITHUB_ACTION_PATH/templates/ubuntu_config_template.yaml
-        thamos advise --recommendation-type security --no-write --json > $GITHUB_ACTION_PATH/advise_result.json
-        advise_exit_code=$?
+        if [ ${{ inputs.overlay-directory }} != '' ];
+            then
+            thamos check
+            sed -i "s/pipenv/$requirements_format/g" .thoth.yaml
+            thamos advise --recommendation-type security --runtime-environment ${{ inputs.overlay-directory }} --no-write --json > $GITHUB_ACTION_PATH/advise_result.json
+            advise_exit_code=$?
+            echo "::set-output name=runtime-environment::${{ inputs.overlay-directory }}"
+        else
+            sed -i "s/pipenv/$requirements_format/g" $GITHUB_ACTION_PATH/templates/ubuntu_config_template.yaml
+            thamos config --no-interactive --template $GITHUB_ACTION_PATH/templates/ubuntu_config_template.yaml
+            thamos check
+            thamos advise --recommendation-type security --no-write --json > $GITHUB_ACTION_PATH/advise_result.json
+            advise_exit_code=$?
+            echo "::set-output name=runtime-environment::Not Specified"
+        fi
+
         if [[ $advise_exit_code -eq 0 ]];
-          then
+            then
             sed -i -n '/"error":/,$p' $GITHUB_ACTION_PATH/advise_result.json
             sed -i '1s/^/{/' $GITHUB_ACTION_PATH/advise_result.json
             echo "::set-output name=thoth-error-msg:: :heavy_check_mark: $(python3 $GITHUB_ACTION_PATH/verify_cve.py $GITHUB_ACTION_PATH/advise_result.json)"
             echo "::set-output name=thoth-search-ui-link::https://thoth-station.ninja/search/advise/$(cat .thoth_last_analysis_id)/summary"
         else
-          echo "::set-output name=thoth-error-msg:: :x: dependencies could not be resolved."
-          echo "::set-output name=thoth-search-ui-link:: https://thoth-station.ninja/search/advise/$(cat .thoth_last_analysis_id)/summary"
+            echo "::set-output name=thoth-error-msg:: :x: dependencies could not be resolved."
+            echo "::set-output name=thoth-search-ui-link:: https://thoth-station.ninja/search/advise/$(cat .thoth_last_analysis_id)/summary"
         fi
         echo "::set-output name=advise-exit-code::$advise_exit_code"
+
     - uses: jwalton/gh-find-current-pr@v1
       id: finder
+
     - uses: marocchino/sticky-pull-request-comment@v2
       with:
         number: ${{ steps.finder.outputs.pr }}
@@ -62,6 +84,8 @@ runs:
         message: |
           - **Dependency analysis status:** ${{ steps.get-thoth-advise.outputs.thoth-error-msg }}
           - **See advise results in Thoth Search UI:** ${{ steps.get-thoth-advise.outputs.thoth-search-ui-link }}
+          - **Runtime environment:** ${{ steps.get-thoth-advise.outputs.runtime-environment }}
+
     - name: Fail workflow if dependencies could not be resolved
       shell: bash
       id: fail-workflow-if-error
