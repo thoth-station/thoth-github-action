@@ -40,14 +40,14 @@ The workflow succeeds if the specified dependencies could be properly resolved a
 ### Analyze your dependencies against a specific runtime environment
 
 To analyze dependencies in a given runtime environment, it is possible to configure a project repository to use overlays for each environment dependencies should be analyzed in.
-The Thoth configuration file named `.thoth.yaml` should be created at the root of the repository, stating the desired runtime environments to use for the resolution as explained in the [Thoth Command Line Interface documentation](https://github.com/thoth-station/thamos#using-custom-configuration-file-template).
+The Thoth configuration file named `.thoth.yaml` should be created at the root of the repository, stating the desired runtime environments to use for the resolution as explained in the [Thoth command line interface documentation](https://github.com/thoth-station/thamos#using-custom-configuration-file-template).
 
 To get advise on multiple runtime environments and store dependency requirement files separately for each environment, it is possible to create [an `overlays` directory](https://github.com/thoth-station/thamos#overlays-directory) in the target repository. A separate workflow to analyze dependencies should then be created for each runtime environment defined in an overlays subdirectory. For example, if the environments you wish to analyze your dependencies against are:
 
 * `fedora` in version `35` using `python 3.10`
 * `rhel` in version `8` using `python 3.8`
 
-under the `.github/workflows/` directory, the different workflow files created would be:
+Under the `.github/workflows/` directory, the different workflow files created would be:
 
 
 `thoth_dependency_analysis_fedora35.yaml`:
@@ -123,6 +123,14 @@ And the repository directory structure:
 
 Note that the `overlay-directory` parameter specified and the name of the corresponding overlays subdirectory must be the same.
 
+#### Environments supported by Thoth
+
+The list of environments currently supported by Thoth for dependency recommendations can be found by installing the [thamos command line interface](https://github.com/thoth-station/thamos/tree/master#thamos) and running:
+
+```
+thamos environments
+```
+
 
 ### Integrating Thoth into a CI workflow
 
@@ -138,7 +146,7 @@ Specify a pattern and rules to follow for branches you want to protect from unch
 
 ## Testing the Action locally
 
-It is possible to run a workflow using the Thoth Adviser GitHub Action locally using [`act`](https://github.com/nektos/act) without pushing or committing directly to the repository.
+It is possible to run a workflow that uses the Thoth Adviser GitHub Action locally with [`act`](https://github.com/nektos/act), without pushing or committing directly to the repository.
 You can start using `act` by following the [installation instructions](https://github.com/nektos/act#installation).
 Note that `act` requires Docker to be installed and that it does not currently support Podman. If you want to have Docker and Podman simultaneously installed on your system (RHEL8 or CentOS8), you can follow [this tutorial](https://medium.com/faun/how-to-install-simultaneously-docker-and-podman-on-rhel-8-centos-8-cb67412f321e).
 
