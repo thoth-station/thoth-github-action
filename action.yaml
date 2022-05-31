@@ -67,10 +67,10 @@ runs:
             sed -i -n '/"error":/,$p' $GITHUB_ACTION_PATH/advise_result.json
             sed -i '1s/^/{/' $GITHUB_ACTION_PATH/advise_result.json
             echo "::set-output name=thoth-error-msg:: :heavy_check_mark: $(python3 $GITHUB_ACTION_PATH/verify_cve.py $GITHUB_ACTION_PATH/advise_result.json)"
-            echo "::set-output name=thoth-search-ui-link::https://thoth-station.ninja/search/advise/$(cat .thoth_last_analysis_id)/summary"
+            echo "::set-output name=thoth-search-ui-link::https://thoth-station.ninja/search/advise/$(cat overlays/${{ inputs.overlay-directory }}/.thoth_last_analysis_id)/summary"
         else
             echo "::set-output name=thoth-error-msg:: :x: dependencies could not be resolved."
-            echo "::set-output name=thoth-search-ui-link:: https://thoth-station.ninja/search/advise/$(cat .thoth_last_analysis_id)/summary"
+            echo "::set-output name=thoth-search-ui-link:: https://thoth-station.ninja/search/advise/$(cat overlays/${{ inputs.overlay-directory }}/.thoth_last_analysis_id)/summary"
         fi
         echo "::set-output name=advise-exit-code::$advise_exit_code"
 
