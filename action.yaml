@@ -37,7 +37,7 @@ runs:
       run: |
         set +e
         mkdir /tmp/thoth/
-        cp -r * /tmp/thoth/
+        cp -r . /tmp/thoth/
         cd /tmp/thoth/
         if ${{ inputs.requirements-format == 'setup.cfg' }};
             then
