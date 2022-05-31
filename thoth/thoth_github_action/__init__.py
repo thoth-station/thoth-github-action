@@ -20,4 +20,4 @@
 
 
 __title__ = "thoth-github-action"
-__version__ = "0.0.0"
+__version__ = "0.1.0"
