@@ -131,6 +131,16 @@ The list of environments currently supported by Thoth for dependency recommendat
 thamos environments
 ```
 
+### Ignoring specific CVE during the resolution
+
+It is possible to allow specific CVE to be ignored during the resolution process, so that a dependency with this vulnerability can still be validated in the analyzed software stack.
+This can be done by specifying a list of CVE to be ignored in the `allow-cve` field:
+
+```
+with:
+  ...
+  allow-cve: PYSEC-2021-94,PYSEC-2021-2
+```
 
 ### Integrating Thoth into a CI workflow
 

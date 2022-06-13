@@ -14,6 +14,10 @@ inputs:
   overlay-directory:
     description: Optional overlay directory to get advise on a specific environment (see documentation for overlays configuration https://github.com/thoth-station/thamos#overlays-directory)
     required: false
+  allow-cve:
+    description: CVE considered as acceptable, that will be ignored during the resolution process
+    required: false
+
 outputs:
   thoth-search-ui-link:
     description: Link to results in Thoth Search UI
@@ -24,9 +28,12 @@ outputs:
   advise-exit-code:
     description: Exit code returned in case of advise failure
     value: ${{ steps.get-thoth-advise.outputs.advise-exit-code }}
-  runtime-environment:
-    description: Runtime environment for which the advise was run
-    value: $${{ steps.get-thoth-advise.outputs.runtime-environment }}
+  runtime-environment-msg:
+    description: Output message with runtime environment for which the advise was run
+    value: $${{ steps.get-thoth-advise.outputs.runtime-environment-msg }}
+  allow-cve-msg:
+    description: Output message with CVE allowed during the resolution process
+    value: ${{ steps.get-thoth-advise.outputs.allowed-cve-msg }}
 
 runs:
   using: 'composite'
@@ -46,22 +53,28 @@ runs:
         else
             requirements_format=${{ inputs.requirements-format }}
         fi
+
+        if [ '${{ inputs.allow-cve }}' != '' ];
+          then
+          labels_command='--labels allow-cve=${{ inputs.allow-cve }}'
+        else
+          labels_command=''
+        fi
+
         if [ '${{ inputs.overlay-directory }}' != '' ];
             then
             thamos check
             sed -i "s/pipenv/$requirements_format/g" .thoth.yaml
-            thamos advise --recommendation-type security --runtime-environment ${{ inputs.overlay-directory }} --no-write --json > $GITHUB_ACTION_PATH/advise_result.json
+            thamos advise --recommendation-type security --runtime-environment ${{ inputs.overlay-directory }} --no-write --json $labels_command > $GITHUB_ACTION_PATH/advise_result.json
             advise_exit_code=$?
-            echo "::set-output name=runtime-environment::${{ inputs.overlay-directory }}"
-            last_analysis_id=$(cat overlays/${{ inputs.overlay-directory }}/.thoth_last_analysis_id)
+            echo "::set-output name=runtime-environment-msg::${{ inputs.overlay-directory }}"
         else
             sed -i "s/pipenv/$requirements_format/g" $GITHUB_ACTION_PATH/templates/ubuntu_config_template.yaml
             thamos config --no-interactive --template $GITHUB_ACTION_PATH/templates/ubuntu_config_template.yaml
             thamos check
-            thamos advise --recommendation-type security --no-write --json > $GITHUB_ACTION_PATH/advise_result.json
+            thamos advise --recommendation-type security --no-write --json $labels_command > $GITHUB_ACTION_PATH/advise_result.json
             advise_exit_code=$?
-            echo "::set-output name=runtime-environment::Not Specified"
-            last_analysis_id=$(cat .thoth_last_analysis_id)
+            echo "::set-output name=runtime-environment-msg::Not Specified"
         fi
 
         if [[ $advise_exit_code -eq 0 ]];
@@ -76,6 +89,13 @@ runs:
         echo "::set-output name=advise-exit-code::$advise_exit_code"
         echo "::set-output name=thoth-search-ui-link::https://thoth-station.ninja/search/advise/$last_analysis_id/summary"
 
+        if [ '${{ inputs.allow-cve-msg }}' != '' ];
+          then
+          echo "::set-output name=allow-cve-msg::${{ inputs.allow-cve }}"
+        else
+          echo "::set-output name=allow-cve-msg::None"
+        fi
+
     - uses: jwalton/gh-find-current-pr@v1
       id: finder
 
@@ -86,7 +106,8 @@ runs:
         message: |
           - **Dependency analysis status:** ${{ steps.get-thoth-advise.outputs.thoth-error-msg }}
           - **See advise results in Thoth Search UI:** ${{ steps.get-thoth-advise.outputs.thoth-search-ui-link }}
-          - **Runtime environment:** ${{ steps.get-thoth-advise.outputs.runtime-environment }}
+          - **Runtime environment:** ${{ steps.get-thoth-advise.outputs.runtime-environment-msg }}
+          - **Allowed CVE:** ${{ steps.get-thoth-advise.outputs.allow-cve-msg }}
 
     - name: Fail workflow if dependencies could not be resolved
       shell: bash
