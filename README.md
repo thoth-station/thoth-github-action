@@ -144,6 +144,17 @@ Specify a pattern and rules to follow for branches you want to protect from unch
 ![](images/branch_protection_rule.png)
 
 
+**Note:** Setting an action as a merge check requires to have the `pull_request` parameter specified in the workflow file as a trigger, with the names of the branches to be checked:
+
+```
+on:
+  pull_request:
+    branches: ["main"]
+    paths:
+      - "setup.cfg"
+```
+
+
 ## Testing the Action locally
 
 It is possible to run a workflow that uses the Thoth Adviser GitHub Action locally with [`act`](https://github.com/nektos/act), without pushing or committing directly to the repository.
