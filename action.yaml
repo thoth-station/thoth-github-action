@@ -53,6 +53,7 @@ runs:
             thamos advise --recommendation-type security --runtime-environment ${{ inputs.overlay-directory }} --no-write --json > $GITHUB_ACTION_PATH/advise_result.json
             advise_exit_code=$?
             echo "::set-output name=runtime-environment::${{ inputs.overlay-directory }}"
+            last_analysis_id=$(cat overlays/${{ inputs.overlay-directory }}/.thoth_last_analysis_id)
         else
             sed -i "s/pipenv/$requirements_format/g" $GITHUB_ACTION_PATH/templates/ubuntu_config_template.yaml
             thamos config --no-interactive --template $GITHUB_ACTION_PATH/templates/ubuntu_config_template.yaml
@@ -60,6 +61,7 @@ runs:
             thamos advise --recommendation-type security --no-write --json > $GITHUB_ACTION_PATH/advise_result.json
             advise_exit_code=$?
             echo "::set-output name=runtime-environment::Not Specified"
+            last_analysis_id=$(cat .thoth_last_analysis_id)
         fi
 
         if [[ $advise_exit_code -eq 0 ]];
@@ -67,12 +69,12 @@ runs:
             sed -i -n '/"error":/,$p' $GITHUB_ACTION_PATH/advise_result.json
             sed -i '1s/^/{/' $GITHUB_ACTION_PATH/advise_result.json
             echo "::set-output name=thoth-error-msg:: :heavy_check_mark: $(python3 $GITHUB_ACTION_PATH/verify_cve.py $GITHUB_ACTION_PATH/advise_result.json)"
-            echo "::set-output name=thoth-search-ui-link::https://thoth-station.ninja/search/advise/$(cat overlays/${{ inputs.overlay-directory }}/.thoth_last_analysis_id)/summary"
         else
             echo "::set-output name=thoth-error-msg:: :x: dependencies could not be resolved."
-            echo "::set-output name=thoth-search-ui-link:: https://thoth-station.ninja/search/advise/$(cat overlays/${{ inputs.overlay-directory }}/.thoth_last_analysis_id)/summary"
         fi
+
         echo "::set-output name=advise-exit-code::$advise_exit_code"
+        echo "::set-output name=thoth-search-ui-link::https://thoth-station.ninja/search/advise/$last_analysis_id/summary"
 
     - uses: jwalton/gh-find-current-pr@v1
       id: finder
