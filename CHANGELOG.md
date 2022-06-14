@@ -1,5 +1,9 @@
 # Changelog for Thoth's Template GitHub Project
 
+## Release 0.1.1 (2022-06-14T10:16:16)
+* 4c140f2 Fix last_analysis_id in Search UI URL
+* ced5787 :arrow_up: Automatic update of dependencies by Kebechet for the rhel8 environment
+
 ## Release 0.1.0 (2022-05-31T15:50:11)
 * d026912 Add Harshad to approvers
 * 4bf768d Add init file for versioning
