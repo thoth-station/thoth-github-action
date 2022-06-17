@@ -1,0 +1,132 @@
+name: Test Thoth Adviser GitHub Action
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  test-pip-cve:
+    runs-on: ubuntu-latest
+    container: quay.io/thoth-station/s2i-thoth-ubi8-py38:latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: use vulnerable requirements.txt
+        id: test-pip-cve
+        shell: bash
+        run: |
+          rm Pipfile Pipfile.lock
+          cp ./tests/test-pip-cve/requirements.txt .
+          cat requirements.txt
+      - name: Test requirements.txt with CVE
+        uses: thoth-station/thoth-github-action@d0e1de92dd9e681be2b0eba1865ca0e3b31c072a
+        with:
+          requirements-format: pip
+          generate-summary: true
+          consider-dev-dependencies: false
+          runtime-environment: ubi-8-py-3.8
+
+  test-pip-no-cve:
+    if: ${{ always() }}
+    needs: test-pip-cve
+    runs-on: ubuntu-latest
+    container: quay.io/thoth-station/s2i-thoth-ubi8-py38:latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: use non vulnerable requirements.txt
+        id: test-pip-no-cve
+        shell: bash
+        run: |
+          rm Pipfile Pipfile.lock
+          cp ./tests/test-pip-no-cve/requirements.txt .
+      - name: Test requirements.txt without CVE
+        uses: thoth-station/thoth-github-action@d0e1de92dd9e681be2b0eba1865ca0e3b31c072a
+        with:
+          requirements-format: pip
+          generate-summary: true
+          consider-dev-dependencies: false
+          runtime-environment: rhel-8-py-3.8
+
+  test-pipenv-cve:
+    if: ${{ always() }}
+    needs: [test-pip-cve, test-pip-no-cve]
+    runs-on: ubuntu-latest
+    container: quay.io/thoth-station/s2i-thoth-ubi8-py38:latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: use vulnerable Pipfile
+        id: test-pipenv-cve
+        shell: bash
+        run: |
+          rm Pipfile Pipfile.lock
+          cp ./tests/test-pipenv-cve/Pipfile .
+      - name: Test Pipfile with CVE
+        uses: thoth-station/thoth-github-action@d0e1de92dd9e681be2b0eba1865ca0e3b31c072a
+        with:
+          requirements-format: pipenv
+          generate-summary: true
+          consider-dev-dependencies: false
+          runtime-environment: fedora-35-py-3.10
+
+  test-pipenv-no-cve:
+    if: ${{ always() }}
+    needs: [test-pip-cve, test-pip-no-cve, test-pipenv-cve]
+    runs-on: ubuntu-latest
+    container: quay.io/thoth-station/s2i-thoth-ubi8-py38:latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: use non vulnerable Pipfile
+        id: test-pipenv-no-cve
+        shell: bash
+        run: |
+          rm Pipfile Pipfile.lock
+          cp ./tests/test-pipenv-no-cve/Pipfile .
+      - name: Test Pipfile without CVE
+        uses: thoth-station/thoth-github-action@d0e1de92dd9e681be2b0eba1865ca0e3b31c072a
+        with:
+          requirements-format: pipenv
+          generate-summary: true
+          consider-dev-dependencies: false
+
+  test-setupcfg-cve:
+    if: ${{ always() }}
+    needs: [test-pip-cve, test-pip-no-cve, test-pipenv-cve, test-pipenv-no-cve]
+    runs-on: ubuntu-latest
+    container: quay.io/thoth-station/s2i-thoth-ubi8-py38:latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: use vulnerable setup.cfg
+        id: test-setupcfg-cve
+        shell: bash
+        run: |
+          rm Pipfile Pipfile.lock
+          cp ./tests/test-setupcfg-cve/setup.cfg .
+      - name: Test setup.cfg with CVE
+        uses: thoth-station/thoth-github-action@d0e1de92dd9e681be2b0eba1865ca0e3b31c072a
+        with:
+          requirements-format: setup.cfg
+          generate-summary: true
+          consider-dev-dependencies: false
+          runtime-environment: fedora-34-py-3.9
+
+  test-setupcfg-no-cve:
+    if: ${{ always() }}
+    needs: [test-pip-cve, test-pip-no-cve, test-pipenv-cve, test-pipenv-no-cve, test-setupcfg-cve]
+    runs-on: ubuntu-latest
+    container: quay.io/thoth-station/s2i-thoth-ubi8-py38:latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: use non vulnerable setup.cfg
+        id: test-setupcfg-no-cve
+        shell: bash
+        run: |
+          rm Pipfile Pipfile.lock
+          cp ./tests/test-setupcfg-no-cve/setup.cfg .
+      - name: Test setup.cfg without CVE
+        uses: thoth-station/thoth-github-action@d0e1de92dd9e681be2b0eba1865ca0e3b31c072a
+        with:
+          requirements-format: setup.cfg
+          generate-summary: true
+          consider-dev-dependencies: false

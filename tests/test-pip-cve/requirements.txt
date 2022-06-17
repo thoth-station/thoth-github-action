@@ -1,0 +1,16 @@
+GitPython
+PyYAML
+click
+lazy_object_proxy
+marshmallow
+marshmallow-enum
+munch
+ogr
+packaging
+python-gnupg
+requests
+setuptools
+tabulate
+koji
+cachetools
+aiohttp==3.7.3
