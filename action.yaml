@@ -3,96 +3,47 @@ author: thoth-station
 description: Get Security Recommendations on your Python Dependencies
 
 inputs:
-  requirements-path:
-    description: Dependency requirements file path
-    required: true
-    default: Pipfile
   requirements-format:
-    description: Requirements format for dependencies, one of (pip | pip-tools | pip-compile | pipenv | setup.cfg)
+    description: Dependency requirements format (pip, pipenv or setup.cfg)
     required: true
     default: pipenv
-  overlay-directory:
-    description: Optional overlay directory to get advise on a specific environment (see documentation for overlays configuration https://github.com/thoth-station/thamos#overlays-directory)
+  generate-summary:
+    description: Generate a summary of Thoth Advise in the action section
     required: false
-outputs:
-  thoth-search-ui-link:
-    description: Link to results in Thoth Search UI
-    value: ${{ steps.get-thoth-advise.outputs.thoth-search-ui-link }}
-  thoth-error-msg:
-    description: Error message if dependencies could not be resolved
-    value: ${{ steps.get-thoth-advise.outputs.thoth-error-msg }}
-  advise-exit-code:
-    description: Exit code returned in case of advise failure
-    value: ${{ steps.get-thoth-advise.outputs.advise-exit-code }}
+    default: true
+  ignore-cve:
+    description: Ignore known CVE during the dependency resolution
+    required: false
+  consider-dev-dependencies:
+    description: Consider development dependencies during the resolution
+    required: false
+    default: false
   runtime-environment:
-    description: Runtime environment for which the advise was run
-    value: $${{ steps.get-thoth-advise.outputs.runtime-environment }}
+    description: Runtime environment used for dependency analysis
+    type: choice
+    required: false
+    options:
+      - ubi-8-py-3.8
+      - rhel-8-py-3.8
+      - fedora-35-py-3.10
+      - fedora-34-py-3.9
 
 runs:
   using: 'composite'
   steps:
     - name: Get Thoth advise
       shell: bash
+      env:
+        INPUT_REQUIREMENTS_FORMAT: "${{ inputs.requirements-format }}"
+        INPUT_GENERATE_SUMMARY: "${{ inputs.generate-summary }}"
+        INPUT_IGNORE_CVE: "${{ inputs.ignore-cve }}"
+        INPUT_CONSIDER_DEV_DEPENDENCIES: "${{ inputs.consider-dev-dependencies }}"
+        INPUT_RUNTIME_ENVIRONMENT: "${{ inputs.runtime-environment }}"
       id: get-thoth-advise
       run: |
+        echo "Running the action"
         set +e
         mkdir /tmp/thoth/
         cp -r . /tmp/thoth/
         cd /tmp/thoth/
-        if ${{ inputs.requirements-format == 'setup.cfg' }};
-            then
-            requirements_format=pip
-            echo "$($GITHUB_ACTION_PATH/setup_cfg_to_requirements_txt.py ${{ inputs.requirements-path }})"
-        else
-            requirements_format=${{ inputs.requirements-format }}
-        fi
-        if [ '${{ inputs.overlay-directory }}' != '' ];
-            then
-            thamos check
-            sed -i "s/pipenv/$requirements_format/g" .thoth.yaml
-            thamos advise --recommendation-type security --runtime-environment ${{ inputs.overlay-directory }} --no-write --json > $GITHUB_ACTION_PATH/advise_result.json
-            advise_exit_code=$?
-            echo "::set-output name=runtime-environment::${{ inputs.overlay-directory }}"
-            last_analysis_id=$(cat overlays/${{ inputs.overlay-directory }}/.thoth_last_analysis_id)
-        else
-            sed -i "s/pipenv/$requirements_format/g" $GITHUB_ACTION_PATH/templates/ubuntu_config_template.yaml
-            thamos config --no-interactive --template $GITHUB_ACTION_PATH/templates/ubuntu_config_template.yaml
-            thamos check
-            thamos advise --recommendation-type security --no-write --json > $GITHUB_ACTION_PATH/advise_result.json
-            advise_exit_code=$?
-            echo "::set-output name=runtime-environment::Not Specified"
-            last_analysis_id=$(cat .thoth_last_analysis_id)
-        fi
-
-        if [[ $advise_exit_code -eq 0 ]];
-            then
-            sed -i -n '/"error":/,$p' $GITHUB_ACTION_PATH/advise_result.json
-            sed -i '1s/^/{/' $GITHUB_ACTION_PATH/advise_result.json
-            echo "::set-output name=thoth-error-msg:: :heavy_check_mark: $(python3 $GITHUB_ACTION_PATH/verify_cve.py $GITHUB_ACTION_PATH/advise_result.json)"
-        else
-            echo "::set-output name=thoth-error-msg:: :x: dependencies could not be resolved."
-        fi
-
-        echo "::set-output name=advise-exit-code::$advise_exit_code"
-        echo "::set-output name=thoth-search-ui-link::https://thoth-station.ninja/search/advise/$last_analysis_id/summary"
-
-    - uses: jwalton/gh-find-current-pr@v1
-      id: finder
-
-    - uses: marocchino/sticky-pull-request-comment@v2
-      with:
-        number: ${{ steps.finder.outputs.pr }}
-        recreate: true
-        message: |
-          - **Dependency analysis status:** ${{ steps.get-thoth-advise.outputs.thoth-error-msg }}
-          - **See advise results in Thoth Search UI:** ${{ steps.get-thoth-advise.outputs.thoth-search-ui-link }}
-          - **Runtime environment:** ${{ steps.get-thoth-advise.outputs.runtime-environment }}
-
-    - name: Fail workflow if dependencies could not be resolved
-      shell: bash
-      id: fail-workflow-if-error
-      run: |
-        if [ ${{ steps.get-thoth-advise.outputs.advise-exit-code }} -gt 0 ];
-          then
-            exit ${{ steps.get-thoth-advise.outputs.advise-exit-code }}
-        fi
+        /usr/bin/python3 $GITHUB_ACTION_PATH/action.py
