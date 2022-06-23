@@ -1,7 +1,7 @@
 [project]
-name = "TODO"
-description = "TODO"
-readme = "README.rst"
+name = "thoth-github-action"
+description = "Thoth Adviser GitHub Action"
+readme = "README.md"
 requires-python = ">=3.8"
 license = {file = "LICENSE"}
 
