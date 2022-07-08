@@ -19,7 +19,6 @@
 
 import configparser
 import os
-import re
 import subprocess
 import sys
 
@@ -65,16 +64,6 @@ def _parse_environment(runtime_environment: Optional[str]) -> List:
     return runtime_environment.split("-")
 
 
-def _setupcfg_to_requirementstxt(requirement: str) -> str:
-    """Parse requirements.txt dependencies to setup.cfg format."""
-    requirement_parts = requirement.split(" ")
-    if len(requirement_parts) >= 1:
-        version_parts = re.split(r"(^[^\d]+)", requirement_parts[-1].strip('"'))[1:]
-        print(version_parts)
-        requirement = requirement_parts[0] + version_parts[0] + version_parts[1]
-    return requirement
-
-
 def _prepare_requirements_file(requirements_format: str) -> None:
     """Get requirements file name from requirements format."""
     requirements_file = _REQUIREMENT_FORMAT_TO_FILE.get(requirements_format)
@@ -97,7 +86,7 @@ def _prepare_requirements_file(requirements_format: str) -> None:
 
         with open("requirements.txt", "w") as requirements_txt_file:
             for line in cfgparser["options"]["install_requires"]:
-                requirements_txt_file.write(_setupcfg_to_requirementstxt(line))
+                requirements_txt_file.write(line)
 
 
 def _prepare_config_file(requirements_format: str, runtime_environment: Optional[str]) -> str:
