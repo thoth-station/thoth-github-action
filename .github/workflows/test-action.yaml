@@ -61,7 +61,7 @@ jobs:
         id: test-pipenv-cve
         shell: bash
         run: |
-          rm Pipfile Pipfile.lock requirements.txt
+          rm Pipfile Pipfile.lock
           cp ./tests/test-pipenv-cve/Pipfile .
           cat Pipfile
       - name: Test Pipfile with CVE
@@ -83,7 +83,7 @@ jobs:
         id: test-pipenv-no-cve
         shell: bash
         run: |
-          rm Pipfile Pipfile.lock requirements.txt
+          rm Pipfile Pipfile.lock
           cp ./tests/test-pipenv-no-cve/Pipfile .
           cat Pipfile
       - name: Test Pipfile without CVE
@@ -104,7 +104,7 @@ jobs:
         id: test-setupcfg-cve
         shell: bash
         run: |
-          rm Pipfile Pipfile.lock requirements.txt
+          rm Pipfile Pipfile.lock
           cp ./tests/test-setupcfg-cve/setup.cfg .
           cat setup.cfg
       - name: Test setup.cfg with CVE
@@ -126,7 +126,7 @@ jobs:
         id: test-setupcfg-no-cve
         shell: bash
         run: |
-          rm Pipfile Pipfile.lock requirements.txt
+          rm Pipfile Pipfile.lock
           cp ./tests/test-setupcfg-no-cve/setup.cfg .
           cat setup.cfg
       - name: Test setup.cfg without CVE
