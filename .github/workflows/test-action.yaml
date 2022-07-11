@@ -21,7 +21,7 @@ jobs:
           cp ./tests/test-pip-cve/requirements.txt .
           cat requirements.txt
       - name: Test requirements.txt with CVE
-        uses: thoth-station/thoth-github-action@a12c69e9d191e26e12a67d0cc1de45517ada2d27
+        uses: thoth-station/thoth-github-action@37a3249c05c8a1610866bc4ef6346d8efb19f1df
         with:
           requirements-format: pip
           generate-summary: true
@@ -43,7 +43,7 @@ jobs:
           cp ./tests/test-pip-no-cve/requirements.txt .
           cat requirements.txt
       - name: Test requirements.txt without CVE
-        uses: thoth-station/thoth-github-action@a12c69e9d191e26e12a67d0cc1de45517ada2d27
+        uses: thoth-station/thoth-github-action@37a3249c05c8a1610866bc4ef6346d8efb19f1df
         with:
           requirements-format: pip
           generate-summary: true
@@ -65,7 +65,7 @@ jobs:
           cp ./tests/test-pipenv-cve/Pipfile .
           cat Pipfile
       - name: Test Pipfile with CVE
-        uses: thoth-station/thoth-github-action@a12c69e9d191e26e12a67d0cc1de45517ada2d27
+        uses: thoth-station/thoth-github-action@37a3249c05c8a1610866bc4ef6346d8efb19f1df
         with:
           requirements-format: pipenv
           generate-summary: true
@@ -87,7 +87,7 @@ jobs:
           cp ./tests/test-pipenv-no-cve/Pipfile .
           cat Pipfile
       - name: Test Pipfile without CVE
-        uses: thoth-station/thoth-github-action@a12c69e9d191e26e12a67d0cc1de45517ada2d27
+        uses: thoth-station/thoth-github-action@37a3249c05c8a1610866bc4ef6346d8efb19f1df
         with:
           requirements-format: pipenv
           generate-summary: true
@@ -108,7 +108,7 @@ jobs:
           cp ./tests/test-setupcfg-cve/setup.cfg .
           cat setup.cfg
       - name: Test setup.cfg with CVE
-        uses: thoth-station/thoth-github-action@a12c69e9d191e26e12a67d0cc1de45517ada2d27
+        uses: thoth-station/thoth-github-action@37a3249c05c8a1610866bc4ef6346d8efb19f1df
         with:
           requirements-format: setup.cfg
           generate-summary: true
@@ -130,7 +130,7 @@ jobs:
           cp ./tests/test-setupcfg-no-cve/setup.cfg .
           cat setup.cfg
       - name: Test setup.cfg without CVE
-        uses: thoth-station/thoth-github-action@a12c69e9d191e26e12a67d0cc1de45517ada2d27
+        uses: thoth-station/thoth-github-action@37a3249c05c8a1610866bc4ef6346d8efb19f1df
         with:
           requirements-format: setup.cfg
           generate-summary: true
