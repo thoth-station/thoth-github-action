@@ -85,8 +85,7 @@ def _prepare_requirements_file(requirements_format: str) -> None:
         cfgparser.read(requirements_file)
 
         with open("requirements.txt", "w") as requirements_txt_file:
-            for line in cfgparser["options"]["install_requires"].splitlines():
-                requirements_txt_file.write(line)
+            requirements_txt_file.writelines(cfgparser["options"]["install_requires"].splitlines())
 
 
 def _prepare_config_file(requirements_format: str, runtime_environment: Optional[str]) -> str:
