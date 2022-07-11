@@ -83,6 +83,7 @@ jobs:
         run: |
           rm Pipfile Pipfile.lock
           cp ./tests/test-pipenv-no-cve/Pipfile .
+          cat Pipfile
       - name: Test Pipfile without CVE
         uses: thoth-station/thoth-github-action@d0e1de92dd9e681be2b0eba1865ca0e3b31c072a
         with:
