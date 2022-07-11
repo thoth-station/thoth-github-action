@@ -41,6 +41,7 @@ jobs:
         run: |
           rm Pipfile Pipfile.lock
           cp ./tests/test-pip-no-cve/requirements.txt .
+          cat requirements.txt
       - name: Test requirements.txt without CVE
         uses: thoth-station/thoth-github-action@1b575b8e86a28673f5c146638350f5f3e296e13d
         with:
@@ -62,6 +63,7 @@ jobs:
         run: |
           rm Pipfile Pipfile.lock
           cp ./tests/test-pipenv-cve/Pipfile .
+          cat Pipfile
       - name: Test Pipfile with CVE
         uses: thoth-station/thoth-github-action@1b575b8e86a28673f5c146638350f5f3e296e13d
         with:
@@ -104,6 +106,7 @@ jobs:
         run: |
           rm Pipfile Pipfile.lock
           cp ./tests/test-setupcfg-cve/setup.cfg .
+          cat setup.cfg
       - name: Test setup.cfg with CVE
         uses: thoth-station/thoth-github-action@1b575b8e86a28673f5c146638350f5f3e296e13d
         with:
@@ -125,6 +128,7 @@ jobs:
         run: |
           rm Pipfile Pipfile.lock
           cp ./tests/test-setupcfg-no-cve/setup.cfg .
+          cat setup.cfg
       - name: Test setup.cfg without CVE
         uses: thoth-station/thoth-github-action@1b575b8e86a28673f5c146638350f5f3e296e13d
         with:
