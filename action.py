@@ -112,6 +112,7 @@ def _prepare_config_file(requirements_format: str, runtime_environment: Optional
 
         with open(".thoth.yaml", "w") as config_file:
             config_file.write(config_file_content)
+            subprocess.run(["cat", ".thoth.yaml"])
 
     summary_content = ""
 
