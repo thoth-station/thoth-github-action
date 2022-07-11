@@ -21,7 +21,7 @@ jobs:
           cp ./tests/test-pip-cve/requirements.txt .
           cat requirements.txt
       - name: Test requirements.txt with CVE
-        uses: thoth-station/thoth-github-action@d0e1de92dd9e681be2b0eba1865ca0e3b31c072a
+        uses: thoth-station/thoth-github-action@b3ff13c65cd00e04d79d97c0f343cd5d9f85cb00
         with:
           requirements-format: pip
           generate-summary: true
@@ -42,7 +42,7 @@ jobs:
           rm Pipfile Pipfile.lock
           cp ./tests/test-pip-no-cve/requirements.txt .
       - name: Test requirements.txt without CVE
-        uses: thoth-station/thoth-github-action@d0e1de92dd9e681be2b0eba1865ca0e3b31c072a
+        uses: thoth-station/thoth-github-action@b3ff13c65cd00e04d79d97c0f343cd5d9f85cb00
         with:
           requirements-format: pip
           generate-summary: true
@@ -63,7 +63,7 @@ jobs:
           rm Pipfile Pipfile.lock
           cp ./tests/test-pipenv-cve/Pipfile .
       - name: Test Pipfile with CVE
-        uses: thoth-station/thoth-github-action@d0e1de92dd9e681be2b0eba1865ca0e3b31c072a
+        uses: thoth-station/thoth-github-action@b3ff13c65cd00e04d79d97c0f343cd5d9f85cb00
         with:
           requirements-format: pipenv
           generate-summary: true
@@ -85,7 +85,7 @@ jobs:
           cp ./tests/test-pipenv-no-cve/Pipfile .
           cat Pipfile
       - name: Test Pipfile without CVE
-        uses: thoth-station/thoth-github-action@d0e1de92dd9e681be2b0eba1865ca0e3b31c072a
+        uses: thoth-station/thoth-github-action@b3ff13c65cd00e04d79d97c0f343cd5d9f85cb00
         with:
           requirements-format: pipenv
           generate-summary: true
@@ -105,7 +105,7 @@ jobs:
           rm Pipfile Pipfile.lock
           cp ./tests/test-setupcfg-cve/setup.cfg .
       - name: Test setup.cfg with CVE
-        uses: thoth-station/thoth-github-action@d0e1de92dd9e681be2b0eba1865ca0e3b31c072a
+        uses: thoth-station/thoth-github-action@b3ff13c65cd00e04d79d97c0f343cd5d9f85cb00
         with:
           requirements-format: setup.cfg
           generate-summary: true
@@ -126,7 +126,7 @@ jobs:
           rm Pipfile Pipfile.lock
           cp ./tests/test-setupcfg-no-cve/setup.cfg .
       - name: Test setup.cfg without CVE
-        uses: thoth-station/thoth-github-action@d0e1de92dd9e681be2b0eba1865ca0e3b31c072a
+        uses: thoth-station/thoth-github-action@b3ff13c65cd00e04d79d97c0f343cd5d9f85cb00
         with:
           requirements-format: setup.cfg
           generate-summary: true
