@@ -21,7 +21,7 @@ jobs:
           cp ./tests/test-pip-cve/requirements.txt .
           cat requirements.txt
       - name: Test requirements.txt with CVE
-        uses: thoth-station/thoth-github-action@d0e1de92dd9e681be2b0eba1865ca0e3b31c072a
+        uses: thoth-station/thoth-github-action@e8417bda152814644bd4e785a1650cd60e6c65f5
         with:
           requirements-format: pip
           generate-summary: true
@@ -30,7 +30,6 @@ jobs:
 
   test-pip-no-cve:
     if: ${{ always() }}
-    needs: test-pip-cve
     runs-on: ubuntu-latest
     container: quay.io/thoth-station/s2i-thoth-ubi8-py38:latest
     steps:
@@ -41,8 +40,9 @@ jobs:
         run: |
           rm Pipfile Pipfile.lock
           cp ./tests/test-pip-no-cve/requirements.txt .
+          cat requirements.txt
       - name: Test requirements.txt without CVE
-        uses: thoth-station/thoth-github-action@d0e1de92dd9e681be2b0eba1865ca0e3b31c072a
+        uses: thoth-station/thoth-github-action@e8417bda152814644bd4e785a1650cd60e6c65f5
         with:
           requirements-format: pip
           generate-summary: true
@@ -51,7 +51,6 @@ jobs:
 
   test-pipenv-cve:
     if: ${{ always() }}
-    needs: [test-pip-cve, test-pip-no-cve]
     runs-on: ubuntu-latest
     container: quay.io/thoth-station/s2i-thoth-ubi8-py38:latest
     steps:
@@ -62,8 +61,9 @@ jobs:
         run: |
           rm Pipfile Pipfile.lock
           cp ./tests/test-pipenv-cve/Pipfile .
+          cat Pipfile
       - name: Test Pipfile with CVE
-        uses: thoth-station/thoth-github-action@d0e1de92dd9e681be2b0eba1865ca0e3b31c072a
+        uses: thoth-station/thoth-github-action@e8417bda152814644bd4e785a1650cd60e6c65f5
         with:
           requirements-format: pipenv
           generate-summary: true
@@ -72,7 +72,6 @@ jobs:
 
   test-pipenv-no-cve:
     if: ${{ always() }}
-    needs: [test-pip-cve, test-pip-no-cve, test-pipenv-cve]
     runs-on: ubuntu-latest
     container: quay.io/thoth-station/s2i-thoth-ubi8-py38:latest
     steps:
@@ -83,8 +82,9 @@ jobs:
         run: |
           rm Pipfile Pipfile.lock
           cp ./tests/test-pipenv-no-cve/Pipfile .
+          cat Pipfile
       - name: Test Pipfile without CVE
-        uses: thoth-station/thoth-github-action@d0e1de92dd9e681be2b0eba1865ca0e3b31c072a
+        uses: thoth-station/thoth-github-action@e8417bda152814644bd4e785a1650cd60e6c65f5
         with:
           requirements-format: pipenv
           generate-summary: true
@@ -92,7 +92,6 @@ jobs:
 
   test-setupcfg-cve:
     if: ${{ always() }}
-    needs: [test-pip-cve, test-pip-no-cve, test-pipenv-cve, test-pipenv-no-cve]
     runs-on: ubuntu-latest
     container: quay.io/thoth-station/s2i-thoth-ubi8-py38:latest
     steps:
@@ -103,8 +102,9 @@ jobs:
         run: |
           rm Pipfile Pipfile.lock
           cp ./tests/test-setupcfg-cve/setup.cfg .
+          cat setup.cfg
       - name: Test setup.cfg with CVE
-        uses: thoth-station/thoth-github-action@d0e1de92dd9e681be2b0eba1865ca0e3b31c072a
+        uses: thoth-station/thoth-github-action@e8417bda152814644bd4e785a1650cd60e6c65f5
         with:
           requirements-format: setup.cfg
           generate-summary: true
@@ -113,7 +113,6 @@ jobs:
 
   test-setupcfg-no-cve:
     if: ${{ always() }}
-    needs: [test-pip-cve, test-pip-no-cve, test-pipenv-cve, test-pipenv-no-cve, test-setupcfg-cve]
     runs-on: ubuntu-latest
     container: quay.io/thoth-station/s2i-thoth-ubi8-py38:latest
     steps:
@@ -124,8 +123,9 @@ jobs:
         run: |
           rm Pipfile Pipfile.lock
           cp ./tests/test-setupcfg-no-cve/setup.cfg .
+          cat setup.cfg
       - name: Test setup.cfg without CVE
-        uses: thoth-station/thoth-github-action@d0e1de92dd9e681be2b0eba1865ca0e3b31c072a
+        uses: thoth-station/thoth-github-action@e8417bda152814644bd4e785a1650cd60e6c65f5
         with:
           requirements-format: setup.cfg
           generate-summary: true

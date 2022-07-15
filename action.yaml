@@ -44,6 +44,6 @@ runs:
         echo "Running the action"
         set +e
         mkdir /tmp/thoth/
-        cp -r . /tmp/thoth/
+        cp -r * /tmp/thoth/
         cd /tmp/thoth/
         /usr/bin/python3 $GITHUB_ACTION_PATH/action.py
