@@ -47,3 +47,4 @@ runs:
         cp -r . /tmp/thoth/
         cd /tmp/thoth/
         /usr/bin/python3 $GITHUB_ACTION_PATH/action.py
+        rm -rf /tmp/thoth/
