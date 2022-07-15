@@ -30,7 +30,6 @@ jobs:
 
   test-pip-no-cve:
     if: ${{ always() }}
-    needs: test-pip-cve
     runs-on: ubuntu-latest
     container: quay.io/thoth-station/s2i-thoth-ubi8-py38:latest
     steps:
@@ -52,7 +51,6 @@ jobs:
 
   test-pipenv-cve:
     if: ${{ always() }}
-    needs: [test-pip-cve, test-pip-no-cve]
     runs-on: ubuntu-latest
     container: quay.io/thoth-station/s2i-thoth-ubi8-py38:latest
     steps:
@@ -74,7 +72,6 @@ jobs:
 
   test-pipenv-no-cve:
     if: ${{ always() }}
-    needs: [test-pip-cve, test-pip-no-cve, test-pipenv-cve]
     runs-on: ubuntu-latest
     container: quay.io/thoth-station/s2i-thoth-ubi8-py38:latest
     steps:
@@ -95,7 +92,6 @@ jobs:
 
   test-setupcfg-cve:
     if: ${{ always() }}
-    needs: [test-pip-cve, test-pip-no-cve, test-pipenv-cve, test-pipenv-no-cve]
     runs-on: ubuntu-latest
     container: quay.io/thoth-station/s2i-thoth-ubi8-py38:latest
     steps:
@@ -117,7 +113,6 @@ jobs:
 
   test-setupcfg-no-cve:
     if: ${{ always() }}
-    needs: [test-pip-cve, test-pip-no-cve, test-pipenv-cve, test-pipenv-no-cve, test-setupcfg-cve]
     runs-on: ubuntu-latest
     container: quay.io/thoth-station/s2i-thoth-ubi8-py38:latest
     steps:
